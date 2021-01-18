@@ -103,7 +103,7 @@ public class ImageController {
         model.addAttribute("image", image);
         model.addAttribute("tags", tags);
         if( image.getUser().getId()!=user.getId() ) {
-            String error = "You are not the owner of the image, thus you cannot edi it";
+            String error = "Only the owner of the image can edit the image";
             model.addAttribute("editError", error);
             model.addAttribute("tags", image.getTags());
             return "images/image";
@@ -158,7 +158,7 @@ public class ImageController {
 
         if( image.getUser().getId()!=user.getId() ) {
             model.addAttribute("image", image);
-            String error = "You are not the owner, thus cannot delete the image";
+            String error = "Only the owner of the image can delete the image";
             model.addAttribute("deleteError", error);
             model.addAttribute("tags", image.getTags());
             return "images/image";

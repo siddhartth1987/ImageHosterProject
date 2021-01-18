@@ -48,6 +48,7 @@ public class ImageController {
     @RequestMapping("/images/{imageId}/{title}")
     public String showImage(@PathVariable("title") String title, @PathVariable("imageId") int imageId,  Model model) {
 
+        //Added imageId; Fixes Part A Issue 1 (https://github.com/upgrad-edu/Course_4_Assignment/issues/1)
         //Image image = imageService.getImageByTitle(title);
         Image image = imageService.getImage(imageId);
         model.addAttribute("image", image);
@@ -94,12 +95,19 @@ public class ImageController {
     //The method first needs to convert the list of all the tags to a string containing all the tags separated by a comma and then add this string in a Model type object
     //This string is then displayed by 'edit.html' file as previous tags of an image
     @RequestMapping(value = "/editImage")
-    public String editImage(@RequestParam("imageId") Integer imageId, Model model) {
+    public String editImage(@RequestParam("imageId") Integer imageId, Model model, HttpSession session) {
         Image image = imageService.getImage(imageId);
-
+        //Added session; Fixes PartA Issue 2 (https://github.com/upgrad-edu/Course_4_Assignment/issues/3)
+        User user = (User) session.getAttribute("loggeduser");
         String tags = convertTagsToString(image.getTags());
         model.addAttribute("image", image);
         model.addAttribute("tags", tags);
+        if( image.getUser().getId()!=user.getId() ) {
+            String error = "You are not the owner of the image, thus you cannot edi it";
+            model.addAttribute("editError", error);
+            model.addAttribute("tags", image.getTags());
+            return "images/image";
+        }
         return "images/edit";
     }
 
@@ -134,7 +142,7 @@ public class ImageController {
         updatedImage.setDate(new Date());
 
         imageService.updateImage(updatedImage);
-        return "redirect:/images/" + updatedImage.getTitle();
+        return "redirect:/images/" + updatedImage.getId() + "/" +updatedImage.getTitle();
     }
 
 
@@ -142,7 +150,19 @@ public class ImageController {
     //The method calls the deleteImage() method in the business logic passing the id of the image to be deleted
     //Looks for a controller method with request mapping of type '/images'
     @RequestMapping(value = "/deleteImage", method = RequestMethod.DELETE)
-    public String deleteImageSubmit(@RequestParam(name = "imageId") Integer imageId) {
+    public String deleteImageSubmit(@RequestParam(name = "imageId") Integer imageId, Model model, HttpSession session) {
+        Image image = imageService.getImage(imageId);
+
+        //Added session to track logged-in user; Fixes Part A Issue 2 (https://github.com/upgrad-edu/Course_4_Assignment/issues/3)
+        User user = (User) session.getAttribute("loggeduser");
+
+        if( image.getUser().getId()!=user.getId() ) {
+            model.addAttribute("image", image);
+            String error = "You are not the owner, thus cannot delete the image";
+            model.addAttribute("deleteError", error);
+            model.addAttribute("tags", image.getTags());
+            return "images/image";
+        }
         imageService.deleteImage(imageId);
         return "redirect:/images";
     }

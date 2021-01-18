@@ -11,9 +11,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.servlet.http.HttpSession;
 import java.util.List;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Controller
 public class UserController {
@@ -40,9 +42,22 @@ public class UserController {
     //This controller method is called when the request pattern is of type 'users/registration' and also the incoming request is of POST type
     //This method calls the business logic and after the user record is persisted in the database, directs to login page
     @RequestMapping(value = "users/registration", method = RequestMethod.POST)
-    public String registerUser(User user) {
+    public String registerUser(User user, RedirectAttributes redirectAttrs) {
+
+        //Added code to validate strength of password; Fixes Part B Issue 1 Password Strength
+        //Using regular expressions to establish the pattern that is acceptable for password strength
+        String regExp = "^(?=(.*[a-zA-Z].*))(?=.*\\d.*)(?=.*\\W.*)[a-zA-Z0-9\\S]{1,200}$";
+        String password = user.getPassword();
+
+        Pattern pattern = Pattern.compile(regExp);
+        Matcher matcher = pattern.matcher(password);
+        if (!matcher.matches()){
+            String error = "Password must contain atleast 1 alphabet, 1 number & 1 special character";
+            redirectAttrs.addAttribute("passwordTypeError", error).addFlashAttribute("passwordTypeError", error);
+            return "redirect:/users/registration";
+        }
         userService.registerUser(user);
-        return "redirect:/users/login";
+        return "users/login";
     }
 
     //This controller method is called when the request pattern is of type 'users/login'

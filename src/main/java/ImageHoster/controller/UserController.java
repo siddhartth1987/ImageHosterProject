@@ -52,12 +52,12 @@ public class UserController {
         Pattern pattern = Pattern.compile(regExp);
         Matcher matcher = pattern.matcher(password);
         if (!matcher.matches()){
-            String error = "Password must contain at least 1 alphabet, 1 number & 1 special character";
+            String error = "Password must contain atleast 1 alphabet, 1 number & 1 special character";
             redirectAttrs.addAttribute("passwordTypeError", error).addFlashAttribute("passwordTypeError", error);
             return "redirect:/users/registration";
         }
         userService.registerUser(user);
-        return "redirect:/users/login";
+        return "users/login";
     }
 
     //This controller method is called when the request pattern is of type 'users/login'

@@ -1,4 +1,3 @@
-/*
 package ImageHoster.controller;
 
 import ImageHoster.model.Image;
@@ -19,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -219,10 +219,20 @@ public class ImageControllerTest {
         user.setUsername("Prerna");
         user.setPassword("password1@@");
 
+
+        List<Tag> arrayList = new ArrayList<Tag>();
+
+        Tag tag1 = new Tag();
+        tag1.setId(1);
+        tag1.setName("testTag");
+
+        arrayList.add(tag1);
+
         Image image = new Image();
         image.setId(1);
         image.setTitle("new");
         image.setDescription("This image is for testing purpose");
+        image.setTags(arrayList);
         image.setUser(user1);
 
 
@@ -309,5 +319,3 @@ public class ImageControllerTest {
                 .andExpect(model().attribute("deleteError", "Only the owner of the image can delete the image"));
     }
 }
-
-*/
